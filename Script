@@ -1,0 +1,38 @@
+#!/bin/bash
+gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
+echo "/bin/ls -l" | ./hsh
+echo $?
+echo "/bin/ls /var" | ./hsh
+echo $?
+echo "/bin/echo Holberton" | ./hsh | wc -c
+echo $?
+echo "/bin/ls" | ./hsh
+echo $?
+echo "/bin/ls
+/bin/ls
+/bin/ls" | ./hsh
+echo $?
+cat AUTHORS | ./hsh
+echo $?
+echo "/bin/ls
+     /bin/ls
+/bin/ls
+   /bin/ls     " | ./hsh
+echo $?
+echo "                " | ./hsh
+echo $?
+echo "env abd" | ./hsh
+echo $?
+echo "ls
+
+ /bin/ls
+
+     ls
+ls
+ ls     " | ./hsh
+echo $?
+echo "ls /var ; ls /var" | ./hsh
+echo $?
+echo "/bin/ls ; /bin/ls ; /bin/ls" | ./hsh
+echo $?
+
