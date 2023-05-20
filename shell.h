@@ -18,4 +18,6 @@ char *_strcat(char *dest, char *src);
 int check_built_cmd(char *str);
 void handle_built_in_commands(char **argv, char **env, char *parent_name);
 char *_strtok(char *src, char *delim);
+int handle_setenv(char **argv, char **env, char *parent_name);
+int handle_unsetenv(char **argv, char **env, char *parent_name);
 #endif

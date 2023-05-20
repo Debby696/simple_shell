@@ -1,12 +1,12 @@
 #include "shell.h"
 
 /**
- * is_delim - function that checks whether a charactter is the delimeter.
+ * check_delim - function that checks whether a charactter is the delimeter.
  * @c: character to be checked.
  * @delim: delimeter charater.
  * Return: 1 if character is delim 0 if not.
  */
-unsigned int is_delim(char c, char *delim)
+int check_delim(char c, char *delim)
 {
 	while (*delim != '\0')
 	{
@@ -35,7 +35,7 @@ char *_strtok(char *src, char *delim)
 
 	while (1)
 	{
-		if (is_delim(*src, delim))
+		if (check_delim(*src, delim))
 		{
 			src++;
 			continue;
@@ -53,7 +53,7 @@ char *_strtok(char *src, char *delim)
 			backup = src;
 			return (ret);
 		}
-		if (is_delim(*src, delim))
+		if (check_delim(*src, delim))
 		{
 			*src = '\0';
 			backup = src + 1;

@@ -112,6 +112,10 @@ void handle_built_in_commands(char **argv, char **env, char *parent_name)
 		handle_exit(argv, parent_name);
 		return;
 	}
-	_strlen(env[0]);
+	if (_strcmp(argv[0], "setenv") == 0)
+		handle_setenv(argv, env, parent_name);
+
+	if (_strcmp(argv[0], "unsetenv") == 0)
+		handle_unsetenv(argv, env, parent_name);
 }
 
