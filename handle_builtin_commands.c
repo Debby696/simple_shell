@@ -117,5 +117,8 @@ void handle_built_in_commands(char **argv, char **env, char *parent_name)
 
 	if (_strcmp(argv[0], "unsetenv") == 0)
 		handle_unsetenv(argv, env, parent_name);
+
+	if (_strcmp(argv[0], "cd") == 0)
+		handle_cd(argv, env, parent_name);
 }
 
