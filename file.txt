@@ -1,9 +1,0 @@
-file.txt
-_getline.c
-_get_tokens.c
-handle_cd.c
-README.md
-shell.h
-_strcmp.c
-strcpy.c
-_str_len.c
