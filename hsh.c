@@ -54,7 +54,6 @@ char *handle_path(char **env, char **argv)
 {
 	char *path = _getenv("PATH", env), cmd[4096], dir[4096];
 	struct stat st;
-	int i = 0;
 
 	if (argv[0] == NULL)
 		return (NULL);
@@ -65,10 +64,9 @@ char *handle_path(char **env, char **argv)
 	cmd[0] = '/';
 	_strcpy(&cmd[1], argv[0]);
 
-	_strcpy(&dir[0], strtok(path, ":"));
-	while (dir[i] != '\0')
-		i++;
-	_strcpy(&dir[i], &cmd[0]);
+	_strcpy(&dir[0], _strtok(path, ":"));
+
+	_strcpy(&dir[_strlen(dir)], &cmd[0]);
 
 	if (stat(dir, &st) == 0)
 	{
@@ -76,13 +74,10 @@ char *handle_path(char **env, char **argv)
 		return (argv[0]);
 	}
 
-	while (_strcpy(&dir[0], strtok(NULL, ":")) != NULL)
+	while (_strcpy(&dir[0], _strtok(NULL, ":")) != NULL)
 	{
-		i = 0;
-		while (dir[i] != '\0')
-			i++;
 
-		_strcpy(&dir[i], &cmd[0]);
+		_strcpy(&dir[_strlen(dir)], &cmd[0]);
 
 		if (stat(dir, &st) == 0)
 		{
@@ -105,12 +100,12 @@ void run(char *str, char *parent, char **env)
 	int x = 0;
 	struct stat st;
 
-	argv[x] = strtok(cp, " ");
+	argv[x] = _strtok(cp, " ");
 
 	while (argv[x] != NULL)
 	{
 		x++;
-		argv[x] = strtok(NULL, " ");
+		argv[x] = _strtok(NULL, " ");
 	}
 
 	argv[x] = (char *) 0;
@@ -139,11 +134,11 @@ void run_non_interactive(char *lineptr, int len, char *parent, char **env)
 
 	if ((_getline(&lineptr[0], &len)) != -1)
 	{
-		arr[i] = strtok(lineptr, "\n");
+		arr[i] = _strtok(lineptr, "\n");
 		while (arr[i] != NULL)
 		{
 			i++;
-			arr[i] = strtok(NULL, "\n");
+			arr[i] = _strtok(NULL, "\n");
 		}
 		i = 0;
 		while (arr[i] != NULL)
@@ -174,11 +169,11 @@ int main(int ac, char **av, char **env)
 		write(STDOUT_FILENO, "$ ", 2);
 		while ((len = _getline(&lineptr[0], &len)) != -1)
 		{
-			arr[i] = strtok(lineptr, "\n");
+			arr[i] = _strtok(lineptr, "\n");
 			while (arr[i] != NULL)
 			{
 				i++;
-				arr[i] = strtok(NULL, "\n");
+				arr[i] = _strtok(NULL, "\n");
 			}
 			i = 0;
 			while (arr[i] != NULL)

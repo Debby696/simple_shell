@@ -16,9 +16,9 @@ char *_getenv(char *env_name, char **env)
 	while (env[x] != NULL)
 	{
 		_strcpy(&str[0], env[x]);
-		if (_strcmp(strtok(str, "="), env_name) == 0)
+		if (_strcmp(_strtok(str, "="), env_name) == 0)
 		{
-			return (strtok(NULL, "="));
+			return (_strtok(NULL, "="));
 		}
 		x++;
 	}
