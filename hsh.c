@@ -17,10 +17,14 @@ void run_child_process(char *parent_name, char **argv, char **env)
 	pid_t child_pid;
 	int wstatus;
 	struct stat st;
+	char err[4096];
 
 	if (stat(argv[0], &st) != 0)
 	{
-		perror(parent_name);
+		_strcpy(&err[0], parent_name);
+		_strcpy(&err[_strlen(err)], ": ");
+		_strcpy(&err[_strlen(err)], argv[0]);
+		perror(err);
 		return;
 	}
 
@@ -53,7 +57,6 @@ void run(char *str, char *parent, char **env)
 {
 	char *argv[4096], buff[4096];
 	int x = 0;
-	struct stat st;
 
 	argv[x] = _strtok(str, " ");
 
@@ -65,17 +68,20 @@ void run(char *str, char *parent, char **env)
 
 	argv[x] = (char *) 0;
 
-	if (stat(argv[0], &st) != 0)
-	{
-		_strcpy(&buff[0], argv[0]);
-		argv[0] = handle_path(env, buff);
-	}
+	_strcpy(&buff[0], argv[0]);
+	argv[0] = handle_path(env, buff);
 
 	if (check_built_cmd(argv[0]) == 0)
 		run_child_process(parent, argv, env);
 	else
 		handle_built_in_commands(argv, env, parent);
 
+	x = 0;
+	while (buff[x])
+	{
+		buff[x] = '\0';
+		x++;
+	}
 }
 /**
  * run_non_interactive - shell function for the non interactive mode.
@@ -101,7 +107,7 @@ void run_non_interactive(char *lineptr, int len, char *parent, char **env)
 		i = 0;
 		while (arr[i] != NULL)
 		{
-			handle_semicolon(arr[i], parent, env);
+			handle_seperator(arr[i], parent, env);
 			i++;
 		}
 		i = 0;
@@ -136,7 +142,7 @@ int main(int ac, char **av, char **env)
 			i = 0;
 			while (arr[i] != NULL)
 			{
-				handle_semicolon(arr[i], av[0], env);
+				handle_seperator(arr[i], av[0], env);
 				i++;
 			}
 			i = 0;

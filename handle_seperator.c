@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
-* handle_semicolon - function that splits command line arguments
+* handle_seperator - function that splits command line arguments
 * at the semicolon
 * @str: command line argument.
 * @parent: name of parent process.
@@ -9,7 +9,7 @@
 * Return: void
 */
 
-void handle_semicolon(char *str, char *parent, char **env)
+void handle_seperator(char *str, char *parent, char **env)
 {
 	char *arr[4096], cpy[4096];
 	int x = 0;
@@ -25,7 +25,7 @@ void handle_semicolon(char *str, char *parent, char **env)
 	while (arr[x] != NULL)
 	{
 		_strcpy(&cpy[0], arr[x]);
-		run(&cpy[0], parent, env);
+		handle_logic_operators(&cpy[0], parent, env);
 		x++;
 	}
 }
