@@ -8,12 +8,8 @@
  */
 int check_delim(char c, char *delim)
 {
-	while (*delim != '\0')
-	{
-		if (c == *delim)
-			return (1);
-		delim++;
-	}
+	if (c == *delim)
+		return (1);
 	return (0);
 }
 
@@ -21,7 +17,7 @@ int check_delim(char c, char *delim)
  * _strtok - function that breaks up a string into tokens
  * @src: String that is to be broken up.
  * @delim: character specifiying where the string is to be broken.
- * Return: pointer to string token.
+ * Return: ret a pointer to a string token.
  */
 char *_strtok(char *src, char *delim)
 {

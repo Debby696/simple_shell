@@ -22,6 +22,7 @@ int handle_setenv(char **argv, char **env, char *parent_name);
 int handle_unsetenv(char **argv, char **env, char *parent_name);
 void handle_cd(char **argv, char **env, char *parent_name);
 void run(char *str, char *parent, char **env);
-void handle_semicolon(char *str, char *parent, char **env);
+void handle_seperator(char *str, char *parent, char **env);
 char *handle_path(char **env, char *str);
+void handle_logic_operators(char *str, char *parent, char **env);
 #endif
