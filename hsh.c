@@ -94,7 +94,7 @@ void run(char *str, char *parent, char **env)
 void run_non_interactive(char *lineptr, int len, char *parent, char **env)
 {
 	char *arr[4096];
-	int i = 0;
+	int i = 0, x = 0;
 
 	if ((_getline(&lineptr[0], &len)) != -1)
 	{
@@ -107,8 +107,16 @@ void run_non_interactive(char *lineptr, int len, char *parent, char **env)
 		i = 0;
 		while (arr[i] != NULL)
 		{
+			while (arr[i][x] != '\0' && arr[i][x] == ' ')
+				x++;
+			if (_strlen(arr[i]) == x)
+			{
+				i++;
+				continue;
+			}
 			handle_seperator(arr[i], parent, env);
 			i++;
+			x = 0;
 		}
 		i = 0;
 	}
@@ -123,7 +131,7 @@ void run_non_interactive(char *lineptr, int len, char *parent, char **env)
 int main(int ac, char **av, char **env)
 {
 	char lineptr[4096], *arr[4096];
-	int len = 0, i = 0;
+	int len = 0, i = 0, x = 0;
 
 	if (ac != 1)
 		return (1);
@@ -142,8 +150,16 @@ int main(int ac, char **av, char **env)
 			i = 0;
 			while (arr[i] != NULL)
 			{
+				while (arr[i][x] != '\0' && arr[i][x] == ' ')
+					x++;
+				if (_strlen(arr[i]) == x)
+				{
+					i++;
+					continue;
+				}
 				handle_seperator(arr[i], av[0], env);
 				i++;
+				x = 0;
 			}
 			i = 0;
 			write(STDOUT_FILENO, "$ ", 2);
