@@ -126,7 +126,7 @@ void run(char *str, char *parent, char **env)
 */
 int main(int ac, char **av, char **env)
 {
-	char ln[4096], *line = &ln[0], *argv[4096];
+	char ln[4096] = {'c'}, *line = &ln[0], *argv[4096];
 	int i = 0;
 
 	if (ac != 1)
