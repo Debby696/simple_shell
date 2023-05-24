@@ -11,7 +11,7 @@
  */
 char *handle_path(char **env, char *str)
 {
-	char path[4096], *path_pt = &path[0], cmd[4096], dir[4096];
+	char path[4096], *path_pt = &path[0], cmd[4096] = {'\0'}, dir[4096] = {'\0'};
 	struct stat st;
 
 	if (str == NULL)

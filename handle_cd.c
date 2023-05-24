@@ -15,8 +15,8 @@ void update_dir_env(char *var_name, char *new_value,
 	char *av[4];
 
 	av[0] = "setenv";
-	av[1] = _strdup(var_name);
-	av[2] = _strdup(new_value);
+	av[1] = var_name;
+	av[2] = new_value;
 	av[3] = (char *) 0;
 	handle_setenv(av, env, parent_name);
 }
@@ -30,12 +30,13 @@ void update_dir_env(char *var_name, char *new_value,
  */
 void last_condition(char **argv, char *parent_name, char **env, char *err_msg)
 {
-	char err[4096];
+	char err[4096] = {'\0'};
+	char *cur_dir = _getenv("PWD", env);
 
 	if (chdir(argv[1]) == 0)
 	{
 		update_dir_env("PWD", argv[1], parent_name, env);
-		update_dir_env("OLDPWD", _getenv("PWD", env), parent_name, env);
+		update_dir_env("OLDPWD", cur_dir, parent_name, env);
 	}
 	else
 	{
@@ -62,7 +63,6 @@ void handle_cd(char **argv, char **env, char *parent_name)
 	_strcpy(&err[0], parent_name);
 	_strcpy(&err[_strlen(err)], ": ");
 	_strcpy(&err[_strlen(err)], argv[0]);
-
 	while (argv[x])
 		x++;
 	if (x > 2)
@@ -72,9 +72,11 @@ void handle_cd(char **argv, char **env, char *parent_name)
 	}
 	if (x == 1)
 	{
+		char *cur_dir = _getenv("PWD", env);
+
 		if (chdir(_getenv("HOME", env)) == 0)
 		{
-			update_dir_env("OLDPWD", _getenv("PWD", env), parent_name, env);
+			update_dir_env("OLDPWD", cur_dir, parent_name, env);
 			update_dir_env("PWD", _getenv("HOME", env), parent_name, env);
 		}
 	}
@@ -91,9 +93,7 @@ void handle_cd(char **argv, char **env, char *parent_name)
 			}
 		}
 		else
-		{
 			last_condition(argv, parent_name, env, &err[0]);
-		}
 	}
 }
 

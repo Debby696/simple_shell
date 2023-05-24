@@ -17,11 +17,11 @@ void handle_lineptr(char *lineptr, char *parent, char **env)
 	char *arr[4096];
 	int i = 0, x = 0;
 
-	arr[i] = strtok(lineptr, "\n");
+	arr[i] = _strtok(lineptr, "\n");
 	while (arr[i] != NULL)
 	{
 		i++;
-		arr[i] = strtok(NULL, "\n");
+		arr[i] = _strtok(NULL, "\n");
 	}
 	i = 0;
 	while (arr[i] != NULL)
@@ -89,21 +89,21 @@ void run_child_process(char *parent_name, char **argv, char **env)
 */
 void run(char *str, char *parent, char **env)
 {
-	char *argv[4096], buff[4096], *buff_pt = &buff[0];
+	char *argv[4096], buff[4096] = {'\0'};
 	int x = 0;
 
-	argv[x] = strtok(str, " ");
+	argv[x] = _strtok(str, " ");
 
 	while (argv[x] != NULL)
 	{
 		x++;
-		argv[x] = strtok(NULL, " ");
+		argv[x] = _strtok(NULL, " ");
 	}
 
 	argv[x] = (char *) 0;
 
-	buff_pt = _strcpy(buff_pt, argv[0]);
-	argv[0] = handle_path(env, buff_pt);
+	_strcpy(buff, argv[0]);
+	argv[0] = handle_path(env, buff);
 
 	if (check_built_cmd(argv[0]) == 0)
 		run_child_process(parent, argv, env);
@@ -126,7 +126,7 @@ void run(char *str, char *parent, char **env)
 */
 int main(int ac, char **av, char **env)
 {
-	char ln[4096] = {'c'}, *line = &ln[0], *argv[4096];
+	char line[4096] = {'c'}, *argv[4096];
 	int i = 0;
 
 	if (ac != 1)
@@ -137,11 +137,11 @@ int main(int ac, char **av, char **env)
 
 	while (read(STDIN_FILENO, line, 4096) && *line != EOF)
 	{
-		argv[i] = strtok(line, "\n");
+		argv[i] = _strtok(line, "\n");
 		while (argv[i] != NULL)
 		{
 			i++;
-			argv[i] = strtok(NULL, "\n");
+			argv[i] = _strtok(NULL, "\n");
 		}
 		i = 0;
 
@@ -156,6 +156,7 @@ int main(int ac, char **av, char **env)
 			line[i] = '\0';
 			i++;
 		}
+		i = 0;
 		if (isatty(STDIN_FILENO))
 			write(STDOUT_FILENO, "$ ", 2);
 	}
