@@ -26,4 +26,5 @@ void run(char *str, char *parent, char **env);
 void handle_seperator(char *str, char *parent, char **env);
 char *handle_path(char **env, char *str);
 void handle_logic_operators(char *str, char *parent, char **env);
+void free_env(char **arr, char **env);
 #endif

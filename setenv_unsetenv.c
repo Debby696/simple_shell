@@ -1,4 +1,5 @@
 #include "shell.h"
+#include <signal.h>
 
 /**
  * handle_setenv - function that handles setenv built in command.
@@ -10,7 +11,7 @@
 int handle_setenv(char **argv, char **env, char *parent_name)
 {
 	int x = 0, env_len = 0;
-	char new_env[4096], err[4096], str[4096];
+	char new_env[4096] = {'\0'}, err[4096] = {'\0'}, str[4096] = {'\0'};
 
 	while (argv[x])
 		x++;
@@ -61,10 +62,11 @@ int handle_setenv(char **argv, char **env, char *parent_name)
 int handle_unsetenv(char **argv, char **env, char *parent_name)
 {
 	int len = 0, x = 0;
-	char err[4096], str[4096];
+	char err[4096] = {'\0'}, str[4096] = {'\0'};
 
 	while (argv[x])
 		x++;
+
 	_strcpy(&err[0], parent_name);
 	_strcpy(&err[_strlen(err)], ": ");
 	_strcpy(&err[_strlen(err)], "unsetenv: ");
