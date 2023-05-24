@@ -12,6 +12,7 @@ int _getline(char *lineptr, int *len);
 char *_strdup(char *str);
 void run_command(char **argv, char **env, char *parent_name);
 void run_child_process(char *parent_name, char **argv, char **env);
+void handle_lineptr(char *lineptr, char *parent, char **env);
 int _strcmp(char *s1, char *s2);
 char *_getenv(char *env_name, char **env);
 char *_strcat(char *dest, char *src);

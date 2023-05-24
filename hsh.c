@@ -6,6 +6,40 @@
 #include <sys/stat.h>
 
 /**
+ * handle_lineptr - function that handles lineptr from getline.
+ * @lineptr: String gotten from the command line.
+ * @env: list of environment variables.
+ * @parent: name of the calling process.
+ * Return: void
+ */
+void handle_lineptr(char *lineptr, char *parent, char **env)
+{
+	char *arr[4096];
+	int i = 0, x = 0;
+
+	arr[i] = _strtok(lineptr, "\n");
+	while (arr[i] != NULL)
+	{
+		i++;
+		arr[i] = _strtok(NULL, "\n");
+	}
+	i = 0;
+	while (arr[i] != NULL)
+	{
+		while (arr[i][x] != '\0' && arr[i][x] == ' ')
+			x++;
+		if (_strlen(arr[i]) == x)
+		{
+			i++;
+			continue;
+		}
+		handle_seperator(arr[i], parent, env);
+		i++;
+		x = 0;
+	}
+	i = 0;
+}
+/**
  * run_child_process - function that forks and runs a child process.
  * @parent_name: Name of the calling process.
  * @argv: list of arguments for execve
@@ -84,44 +118,6 @@ void run(char *str, char *parent, char **env)
 	}
 }
 /**
- * run_non_interactive - shell function for the non interactive mode.
- * @lineptr: String gotten from the command line.
- * @len: len of lineptr.
- * @env: list of environment variables.
- * @parent: name of the calling process.
- * Return: void
- */
-void run_non_interactive(char *lineptr, int len, char *parent, char **env)
-{
-	char *arr[4096];
-	int i = 0, x = 0;
-
-	if ((_getline(&lineptr[0], &len)) != -1)
-	{
-		arr[i] = _strtok(lineptr, "\n");
-		while (arr[i] != NULL)
-		{
-			i++;
-			arr[i] = _strtok(NULL, "\n");
-		}
-		i = 0;
-		while (arr[i] != NULL)
-		{
-			while (arr[i][x] != '\0' && arr[i][x] == ' ')
-				x++;
-			if (_strlen(arr[i]) == x)
-			{
-				i++;
-				continue;
-			}
-			handle_seperator(arr[i], parent, env);
-			i++;
-			x = 0;
-		}
-		i = 0;
-	}
-}
-/**
 * main - entry point.
 * @ac: argument count.
 * @av: list of command line arguments.
@@ -130,8 +126,8 @@ void run_non_interactive(char *lineptr, int len, char *parent, char **env)
 */
 int main(int ac, char **av, char **env)
 {
-	char lineptr[4096], *arr[4096];
-	int len = 0, i = 0, x = 0;
+	char lineptr[4096];
+	int len = 0;
 
 	if (ac != 1)
 		return (1);
@@ -141,33 +137,16 @@ int main(int ac, char **av, char **env)
 		write(STDOUT_FILENO, "$ ", 2);
 		while ((len = _getline(&lineptr[0], &len)) != -1)
 		{
-			arr[i] = _strtok(lineptr, "\n");
-			while (arr[i] != NULL)
-			{
-				i++;
-				arr[i] = _strtok(NULL, "\n");
-			}
-			i = 0;
-			while (arr[i] != NULL)
-			{
-				while (arr[i][x] != '\0' && arr[i][x] == ' ')
-					x++;
-				if (_strlen(arr[i]) == x)
-				{
-					i++;
-					continue;
-				}
-				handle_seperator(arr[i], av[0], env);
-				i++;
-				x = 0;
-			}
-			i = 0;
+			handle_lineptr(lineptr, av[0], env);
 			write(STDOUT_FILENO, "$ ", 2);
 		}
 		write(STDOUT_FILENO, "\nexit\n", 6);
 	}
 	else
-		run_non_interactive(&lineptr[0], len, av[0], env);
+	{
+		if ((_getline(&lineptr[0], &len)) != -1)
+			handle_lineptr(lineptr, av[0], env);
+	}
 	return (0);
 }
 
