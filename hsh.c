@@ -6,6 +6,42 @@
 #include <sys/stat.h>
 
 /**
+ * check_symbol - function that checks for symbol in first character.
+ * @str: String gotten from the command line.
+ * @parent: name of the calling process.
+ * Return: int
+ */
+int check_symbol(char *str, char *parent)
+{
+	char err[4096] = {'\0'};
+
+	if (*str == ';' || *str == '&' || *str == '|')
+	{
+		_strcpy(&err[0], parent);
+		_strcpy(&err[_strlen(err)], ": syntax error near unexpected token");
+		if (*str == ';')
+		{
+			*(str + 1) == ';' ? _strcpy(&err[_strlen(err)], "\';;\'")
+			: _strcpy(&err[_strlen(err)], " \';\'");
+		}
+		if (*str == '|')
+		{
+			*(str + 1) == '|' ? _strcpy(&err[_strlen(err)], "\'||\'")
+			: _strcpy(&err[_strlen(err)], " \'|\'");
+		}
+		if (*str == '&')
+		{
+			*(str + 1) == '&' ? _strcpy(&err[_strlen(err)], "\'&&\'")
+			: _strcpy(&err[_strlen(err)], " \'&\'");
+		}
+		_strcpy(&err[_strlen(err)], " \n");
+		write(STDERR_FILENO, err, _strlen(err));
+
+		return (1);
+	}
+	return (0);
+}
+/**
  * handle_lineptr - function that handles lineptr from getline.
  * @lineptr: String gotten from the command line.
  * @env: list of environment variables.
@@ -140,25 +176,28 @@ int main(int ac, char **av, char **env)
 	while (read(STDIN_FILENO, line, 4096) && *line != EOF)
 	{
 		argv[i] = _strtok(line, "\n");
-		while (argv[i] != NULL)
+		if (check_symbol(line, av[0]) == 0)
 		{
-			i++;
-			argv[i] = _strtok(NULL, "\n");
-		}
-		i = 0;
+			while (argv[i] != NULL)
+			{
+				i++;
+				argv[i] = _strtok(NULL, "\n");
+			}
+			i = 0;
 
-		while (argv[i] != NULL)
-		{
-			handle_lineptr(argv[i], av[0], env);
-			i++;
+			while (argv[i] != NULL)
+			{
+				handle_lineptr(argv[i], av[0], env);
+				i++;
+			}
+			i = 0;
+			while (line[i] != '\0')
+			{
+				line[i] = '\0';
+				i++;
+			}
+			i = 0;
 		}
-		i = 0;
-		while (line[i] != '\0')
-		{
-			line[i] = '\0';
-			i++;
-		}
-		i = 0;
 		if (isatty(STDIN_FILENO))
 			write(STDOUT_FILENO, "$ ", 2);
 	}
