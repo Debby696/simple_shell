@@ -1,0 +1,17 @@
+#!/bin/bash
+gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
+echo "exit 1000" | ./hsh
+echo $?
+echo "exit 98" | ./hsh
+echo $?
+echo "exit -98" | ./hsh
+echo $?
+echo "/bin/ls /test_hbtn
+exit" | ./hsh
+echo $?
+echo "exit" | ./hsh
+echo $?
+echo "exit" | ./hsh
+echo $?
+echo "exit HBTN" | ./hsh
+echo $?

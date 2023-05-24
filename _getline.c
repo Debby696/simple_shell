@@ -1,7 +1,7 @@
 #include "shell.h"
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
+
 /**
 * _getline - function that reads input from the standard input
 * @lineptr: pointer to a string buffer that will store the read input.
@@ -11,20 +11,16 @@
 int _getline(char *lineptr, int *len)
 {
 	char buff[4096];
-	int index = -1, x = 0;
+	int index = -1;
 
-	while (buff[x])
-	{
-		buff[x] = '\0';
-		x++;
-	}
+	set_mem(&buff[0]);
 	while (read(STDIN_FILENO, buff, 4096) && *buff != EOF)
 	{
-		index = _strlen(buff);
+		index = _str_len(buff);
 		break;
 	}
 	lineptr = _strcpy(lineptr, buff);
-	*len = _strlen(lineptr);
+	*len = _str_len(lineptr);
 	return (index);
 }
 

@@ -8,10 +8,11 @@
  */
 char *_strcpy(char *dest, char *src)
 {
-	if (dest == NULL || src == NULL)
-		return (NULL);
-	while ((*dest++ = *src++))
-		;
+	int x = 0;
+
+	while ((dest[x] = src[x]))
+		x++;
 	return (dest);
 }
+
 
