@@ -19,6 +19,8 @@ int check_built_cmd(char *str)
 		return (1);
 	if (_strcmp(str, "env") == 0)
 		return (1);
+	if (_strcmp(str, "alias") == 0)
+		return (1);
 	return (0);
 }
 /**
@@ -99,6 +101,7 @@ void handle_exit(char **argv, char *parent_name)
 		exit(2);
 	}
 }
+
 /**
  * handle_built_in_commands - function that handles shell built in commands.
  * @argv: list of cli arguments.
@@ -132,7 +135,8 @@ void handle_built_in_commands(char **argv, char **env, char *parent_name)
 			write(STDOUT_FILENO, "\n", 1);
 			x++;
 		}
-
 	}
+	if (_strcmp(argv[0], "alias") == 0)
+		handle_alias(argv, parent_name);
 }
 

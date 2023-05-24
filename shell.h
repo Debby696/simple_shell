@@ -7,6 +7,7 @@
 #include <string.h>
 
 char *_strcpy(char *dest, char *src);
+char *_strncpy(char *dest, char *src, int n);
 int _strlen(char *str);
 int _getline(char **lineptr, int *len);
 char *_strdup(char *str);
@@ -26,5 +27,5 @@ void run(char *str, char *parent, char **env);
 void handle_seperator(char *str, char *parent, char **env);
 char *handle_path(char **env, char *str);
 void handle_logic_operators(char *str, char *parent, char **env);
-void free_env(char **arr, char **env);
+void handle_alias(char **argv, char *parent);
 #endif
