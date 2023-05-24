@@ -1,78 +1,61 @@
 #include "shell.h"
-#include <stdlib.h>
 
 /**
- * check_empty - A function that checks if input string in
- *	_strtok is an empty string.
- * @str: input string taken by _strtok.
- * Return: Number of empty characters.
+ * check_delim - function that checks whether a charactter is the delimeter.
+ * @c: character to be checked.
+ * @delim: delimeter charater.
+ * Return: 1 if character is delim 0 if not.
  */
-int check_empty(char *str)
+int check_delim(char c, char *delim)
 {
-	int x = 0;
-	char *empty = " ", *cpy = str;
-
-	while (*cpy++ == *empty)
-		x++;
-	return (x);
+	if (c == *delim)
+		return (1);
+	return (0);
 }
+
 /**
- * set_mem - function that sets string char to null byte;
- * @str: pointer to string that is to be set
- * Return: void.
+ * _strtok - function that breaks up a string into tokens
+ * @src: String that is to be broken up.
+ * @delim: character specifiying where the string is to be broken.
+ * Return: ret a pointer to a string token.
  */
-void set_mem(char *str)
+char *_strtok(char *src, char *delim)
 {
-	int set = 0;
+	static char *backup;
+	char *ret;
 
-	while (str[set])
-	{
-		str[set] = '\0';
-		set++;
-	}
-}
-/**
-* _strtok - function that splits string into token at the positions specified
-*	by the delimeter.
-* @str: Input string that is to be split into tokens.
-* @delim: String specifying the positions to split the string at
-* Return: The function returns an array of the split strings.
-*/
-str_arr_struct _strtok(char *str, char *delim)
-{
-	char *cp = str, token[4096];
-	int i = 0, index = 0;
-	str_arr_struct cmd_arr;
+	if (!src)
+		src = backup;
+	if (!src)
+		return (NULL);
 
-	cmd_arr.arr = malloc(sizeof(char **));
-	while (*cp != '\0' && (_str_len(str) != check_empty(str)))
+	while (1)
 	{
-		if (*cp == *delim)
+		if (check_delim(*src, delim))
 		{
-			while (*cp == *delim)
-				cp++;
-			token[i] = '\0';
-			if (check_empty(token) != _str_len(token))
-			{
-				cmd_arr.arr[index] = _str_dup(token);
-				index++;
-			}
-			set_mem(&token[0]);
-			i = 0;
+			src++;
+			continue;
 		}
-		token[i] = *cp;
-		if (*(cp + 1) == '\0' && *cp != '\0')
-		{
-			token[i + 1] = '\0';
-			cmd_arr.arr[index] = _str_dup(token);
-			index++;
-		}
-		cp++;
-		i++;
+
+		if (*src == '\0')
+			return (NULL);
+		break;
 	}
-	cmd_arr.arr[index] = malloc(sizeof(char *) + 1);
-	cmd_arr.arr[index] = (char *) 0;
-	cmd_arr.arr_size = index;
-	return (cmd_arr);
+	ret = src;
+	while (1)
+	{
+		if (*src == '\0')
+		{
+			backup = src;
+			return (ret);
+		}
+		if (check_delim(*src, delim))
+		{
+			*src = '\0';
+			backup = src + 1;
+			return (ret);
+		}
+		src++;
+	}
 }
 

@@ -10,17 +10,23 @@
 
 char *_getenv(char *env_name, char **env)
 {
-	int x = 0;
-	char *rtn_str = NULL;
+	int x = 0, i = 0;
 
 	while (env[x] != NULL)
 	{
-		rtn_str = malloc(sizeof(_strtok(env[x], "=").arr[0]) + 1);
-		rtn_str = _strtok(env[x], "=").arr[0];
-		if (_strcmp(env_name, rtn_str) == 0)
+		while (env_name[i] != '\0')
 		{
-			free(rtn_str);
-			return (_strtok(env[x], "=").arr[1]);
+			if (env[x][i] == env_name[i])
+			{
+				if (env_name[i + 1] == '\0' && env[x][i + 1] == '=')
+				{
+					i += 2;
+					return (env[x] + i);
+				}
+				i++;
+				continue;
+			}
+			break;
 		}
 		x++;
 	}

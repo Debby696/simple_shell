@@ -1,66 +1,43 @@
 #include "shell.h"
 #include <stdio.h>
 #include <unistd.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
-#include <string.h>
 
 /**
- * run_command - A function that executes a command using execve
- * @argv: list of command line arguments.
- * @env: The environment variables passed from the parent process.
- * @parent_name: name of the parent process running the shell
+ * handle_lineptr - function that handles lineptr from getline.
+ * @lineptr: String gotten from the command line.
+ * @env: list of environment variables.
+ * @parent: name of the calling process.
  * Return: void
  */
-void run_command(char **argv, char **env, char *parent_name)
+void handle_lineptr(char *lineptr, char *parent, char **env)
 {
-	if (execve(argv[0], argv, env) == -1)
+	char *arr[4096];
+	int i = 0, x = 0;
+
+	arr[i] = strtok(lineptr, "\n");
+	while (arr[i] != NULL)
 	{
-		parent_name = argv[0];
-		perror(parent_name);
-		exit(1);
+		i++;
+		arr[i] = strtok(NULL, "\n");
 	}
-}
-/**
- * handle_path - function that checks if a binary file is located in
- *	one of the directory in the path environment variable.
- * @env: list of environment variables.
- * @argv: list of command line arguments.
- * @parent_name: name of shell program
- * Return: A pointee to the first directory contaning the binary @cmd_str
- *	or NULL if the it is not found.
- */
-char *handle_path(char **env, char **argv, char *parent_name)
-{
-	char *path = _getenv("PATH", env), *cmd, *err_msg;
-	int x = 0;
-	struct stat st;
-	str_arr_struct directories = _strtok(path, ":");
-
-	if (argv[0] == NULL)
-		return (NULL);
-
-	if (stat(argv[0], &st) == 0)
-		return (argv[0]);
-
-	cmd = _strcat("/", argv[0]);
-
-	if (path == NULL)
-		return (NULL);
-
-	while (x < directories.arr_size)
+	i = 0;
+	while (arr[i] != NULL)
 	{
-		if (stat(_strcat(directories.arr[x], cmd), &st) == 0)
+		while (arr[i][x] != '\0' && arr[i][x] == ' ')
+			x++;
+		if (_strlen(arr[i]) == x)
 		{
-			return (_strcat(directories.arr[x], cmd));
+			i++;
+			continue;
 		}
-		x++;
+		handle_seperator(arr[i], parent, env);
+		i++;
+		x = 0;
 	}
-	err_msg = _strcat(parent_name, ": ");
-	err_msg = _strcat(err_msg, argv[0]);
-	return (err_msg);
+	i = 0;
 }
 /**
  * run_child_process - function that forks and runs a child process.
@@ -73,6 +50,17 @@ void run_child_process(char *parent_name, char **argv, char **env)
 {
 	pid_t child_pid;
 	int wstatus;
+	struct stat st;
+	char err[4096], *err_pt = &err[0];
+
+	if (stat(argv[0], &st) != 0)
+	{
+		_strcpy(err_pt, parent_name);
+		_strcpy((err_pt + _strlen(err_pt)), ": ");
+		_strcpy((err + _strlen(err_pt)), argv[0]);
+		perror(err_pt);
+		return;
+	}
 
 	child_pid = fork();
 
@@ -82,101 +70,94 @@ void run_child_process(char *parent_name, char **argv, char **env)
 		exit(1);
 	}
 	if (child_pid == 0)
-		run_command(argv, env, parent_name);
+	{
+		if (execve(argv[0], argv, env) == -1)
+		{
+			perror(parent_name);
+			exit(1);
+		}
+	}
 	else
 		wait(&wstatus);
 }
 /**
- * run_non_interactive - shell function for the non interactive mode.
- * @lineptr: String gotten from the command line.
- * @len: len of lineptr.
- * @env: list of environment variables.
- * @parent_name: name of the calling process.
- * Return: void
- */
-void run_non_interactive(char *lineptr, int len, char **env, char *parent_name)
+ * run - function that gets cmd tokens and runs the command.
+ * @str: command line arguments.
+ * @parent: name of parent program.
+ * @env: environment variables.
+ * Return: void.
+*/
+void run(char *str, char *parent, char **env)
 {
-	char **argv;
-	struct stat st;
-	cmd_arr_strct cmd_struct;
+	char *argv[4096], buff[4096], *buff_pt = &buff[0];
 	int x = 0;
 
-	if (_getline(lineptr, &len) != -1)
+	argv[x] = strtok(str, " ");
+
+	while (argv[x] != NULL)
 	{
-		x = 0;
-		cmd_struct = remove_newline(lineptr);
-		while (x < cmd_struct.arr_size)
-		{
-			argv = _get_tokens(cmd_struct.cmd_arr[x]);
-			if (argv[0] != NULL)
-				handle_built_in_commands(argv, env, parent_name);
-
-			if (stat(argv[0], &st) != 0 &&
-				check_built_cmd(argv[0]) == 0)
-				argv[0] = handle_path(env, argv, parent_name);
-
-			if (stat(argv[0], &st) != 0 && argv[0] != NULL &&
-				check_built_cmd(argv[0]) == 0)
-				perror(argv[0]);
-
-			if (argv[0] != NULL && stat(argv[0], &st) == 0 &&
-				check_built_cmd(argv[0]) == 0)
-				run_command(argv, env, parent_name);
-			x++;
-		}
-		free_mem(argv);
-		free_mem(cmd_struct.cmd_arr);
+		x++;
+		argv[x] = strtok(NULL, " ");
 	}
 
+	argv[x] = (char *) 0;
+
+	buff_pt = _strcpy(buff_pt, argv[0]);
+	argv[0] = handle_path(env, buff_pt);
+
+	if (check_built_cmd(argv[0]) == 0)
+		run_child_process(parent, argv, env);
+	else
+		handle_built_in_commands(argv, env, parent);
+
+	x = 0;
+	while (buff[x])
+	{
+		buff[x] = '\0';
+		x++;
+	}
 }
 /**
 * main - entry point.
-* @ac: Argument count
-* @av: Array of command line arguments
-* @env: environment variables
-* Return: 0 on success
+* @ac: argument count.
+* @av: list of command line arguments.
+* @env: list of environment variables.
+* Return: int
 */
 int main(int ac, char **av, char **env)
 {
-	char *prompt = "$ ", lineptr[4096], **argv;
-	int len = 0, x = 0;
-	struct stat st;
-	cmd_arr_strct cmd_struct;
+	char ln[4096], *line = &ln[0], *argv[4096];
+	int i = 0;
 
 	if (ac != 1)
 		return (1);
-	if (isatty(STDIN_FILENO)) /* Run commands in interactive mode */
+
+	if (isatty(STDIN_FILENO))
+		write(STDOUT_FILENO, "$ ", 2);
+
+	while (read(STDIN_FILENO, line, 4096) && *line != EOF)
 	{
-		set_mem(&lineptr[0]);
-		write(STDOUT_FILENO, prompt, _str_len(prompt));
-		while ((len = _getline(&lineptr[0], &len)) != -1)
+		argv[i] = strtok(line, "\n");
+		while (argv[i] != NULL)
 		{
-			x = 0;
-			cmd_struct = remove_newline(lineptr);
-			while (x < cmd_struct.arr_size)
-			{
-				argv = _get_tokens(cmd_struct.cmd_arr[x]);
-				if (argv[0] != NULL)
-					handle_built_in_commands(argv, env, av[0]);
-				if (stat(argv[0], &st) != 0 &&
-					check_built_cmd(argv[0]) == 0)
-					argv[0] = handle_path(env, argv, av[0]);
-				if (stat(argv[0], &st) != 0 && argv[0] != NULL &&
-					check_built_cmd(argv[0]) == 0)
-					perror(argv[0]);
-				if (argv[0] != NULL && stat(argv[0], &st) == 0 &&
-					check_built_cmd(argv[0]) == 0)
-					run_child_process(av[0], argv, env);
-				x++;
-			}
-			write(STDOUT_FILENO, "$ ", 2);
-			free_mem(argv);
-			free_mem(cmd_struct.cmd_arr);
+			i++;
+			argv[i] = strtok(NULL, "\n");
 		}
-		write(STDOUT_FILENO, "\nexit\n", _str_len("\nexit\n"));
+		i = 0;
+
+		while (argv[i] != NULL)
+		{
+			handle_lineptr(argv[i], av[0], env);
+			i++;
+		}
+		i = 0;
+		while (line[i] != '\0')
+		{
+			line[i] = '\0';
+			i++;
+		}
+		if (isatty(STDIN_FILENO))
+			write(STDOUT_FILENO, "$ ", 2);
 	}
-	else  /* Run code in none interactive mode */
-		run_non_interactive(lineptr, len, env, av[0]);
 	return (0);
 }
-
