@@ -17,6 +17,8 @@ int check_built_cmd(char *str)
 		return (1);
 	if (_strcmp(str, "cd") == 0)
 		return (1);
+	if (_strcmp(str, "env") == 0)
+		return (1);
 	return (0);
 }
 /**
@@ -62,16 +64,15 @@ int check_digit(char *str)
  */
 void handle_exit(char **argv, char *parent_name)
 {
-	char err[4096];
+	char err[4096] = {'\0'};
 	int x = 0;
 
 	_strcpy(&err[0], parent_name);
 	_strcpy(&err[_strlen(err)], ": ");
 
 	while (argv[x])
-	{
 		x++;
-	}
+
 	if (x == 1)
 	{
 		write(STDERR_FILENO, "exit\n", _strlen("exit\n"));
@@ -120,5 +121,17 @@ void handle_built_in_commands(char **argv, char **env, char *parent_name)
 
 	if (_strcmp(argv[0], "cd") == 0)
 		handle_cd(argv, env, parent_name);
+
+	if (_strcmp(argv[0], "env") == 0)
+	{
+		int x = 0;
+
+		while (env[x] != NULL)
+		{
+			write(STDOUT_FILENO, env[x], _strlen(env[x]));
+			x++;
+		}
+
+	}
 }
 
