@@ -62,11 +62,11 @@ int check_digit(char *str)
  */
 void handle_exit(char **argv, char *parent_name)
 {
-	char *err_msg;
+	char err[4096];
 	int x = 0;
 
-	err_msg = _strcat(parent_name, ": ");
-	err_msg = _strcat(err_msg, argv[0]);
+	_strcpy(&err[0], parent_name);
+	_strcpy(&err[_strlen(err)], ": ");
 
 	while (argv[x])
 	{
@@ -74,29 +74,27 @@ void handle_exit(char **argv, char *parent_name)
 	}
 	if (x == 1)
 	{
-		write(STDERR_FILENO, "exit\n", _str_len("exit\n"));
+		write(STDERR_FILENO, "exit\n", _strlen("exit\n"));
 		exit(0);
 	}
 	else if (x == 2 && check_digit(argv[1]) == 0)
 	{
 		if (isatty(STDIN_FILENO))
-			write(STDERR_FILENO, "exit\n", _str_len("exit\n"));
+			write(STDERR_FILENO, "exit\n", _strlen("exit\n"));
 		exit(string_to_int(argv[1]));
 	}
 	else if (x > 2 && check_digit(argv[1]) == 0)
 	{
-		err_msg = _strcat(parent_name, ": ");
-		err_msg = _strcat(err_msg, "exit: too many arguments\n");
-		write(STDERR_FILENO, err_msg, _str_len(err_msg));
+		_strcpy(&err[_strlen(err)], "exit: too many arguments\n");
+		write(STDERR_FILENO, err, _strlen(err));
 		return;
 	}
 	else
 	{
-		err_msg = _strcat(parent_name, ": ");
-		err_msg = _strcat(err_msg, "exit: ");
-		err_msg = _strcat(err_msg, argv[1]);
-		err_msg = _strcat(err_msg, ": numeric argument required\n");
-		write(STDERR_FILENO, err_msg, _str_len(err_msg));
+		_strcpy(&err[_strlen(err)], "exit: ");
+		_strcpy(&err[_strlen(err)], argv[1]);
+		_strcpy(&err[_strlen(err)], ": numeric argument required\n");
+		write(STDERR_FILENO, err, _strlen(err));
 		exit(2);
 	}
 }
@@ -115,15 +113,12 @@ void handle_built_in_commands(char **argv, char **env, char *parent_name)
 		return;
 	}
 	if (_strcmp(argv[0], "setenv") == 0)
-	{
 		handle_setenv(argv, env, parent_name);
-	}
+
 	if (_strcmp(argv[0], "unsetenv") == 0)
-	{
 		handle_unsetenv(argv, env, parent_name);
-	}
+
 	if (_strcmp(argv[0], "cd") == 0)
-	{
 		handle_cd(argv, env, parent_name);
-	}
 }
+

@@ -10,38 +10,44 @@
 int handle_setenv(char **argv, char **env, char *parent_name)
 {
 	int x = 0, env_len = 0;
-	char *new_env, *err_msg;
+	char new_env[4096], err[4096], str[4096];
 
 	while (argv[x])
 		x++;
-	err_msg = _strcat(_strcat(parent_name, ": "), "setenv: ");
+	_strcpy(&err[0], parent_name);
+	_strcpy(&err[_strlen(err)], ": ");
+	_strcpy(&err[_strlen(err)], "setenv: ");
+
 	if (x != 3)
 	{
-		err_msg = x > 3 ? _strcat(err_msg, "Too many arguments\n")
-		: _strcat(err_msg, "Fewer arguments than expected\n");
-		write(STDERR_FILENO, err_msg, _str_len(err_msg));
-		return (-1); /*exit(EXIT_FAILURE);*/
+		x > 3 ? _strcpy(&err[_strlen(err)], "Too many arguments\n")
+		: _strcpy(&err[_strlen(err)], "Fewer arguments than expected\n");
+		write(STDERR_FILENO, err, _strlen(err));
+		return (-1);
 	}
-
-	while (env[env_len] != NULL &&
-		_strcmp(_strtok(env[env_len], "=").arr[0], argv[1]) != 0)
+	while (env[env_len] != NULL)
+	{
+		_strcpy(&str[0], env[env_len]);
+		if (_strcmp(_strtok(str, "="), argv[1]) == 0)
+			break;
 		env_len++;
-
+	}
 	if (env[env_len] == NULL)
 	{
-		new_env = _strcat(_strcat(argv[1], "="), argv[2]);
-		env[env_len] = malloc(sizeof(char) * _str_len(new_env) + 1);
-		env[env_len] = new_env;
-		env[env_len + 1] = malloc(sizeof(char *));
+		_strcpy(&new_env[0], argv[1]);
+		_strcpy(&new_env[_strlen(new_env)], "=");
+		_strcpy(&new_env[_strlen(new_env)], argv[2]);
+		env[env_len] = _strdup(new_env);
 		env[env_len + 1] = (char *) 0;
-		return (0); /*exit(EXIT_SUCCESS);*/
+		return (0);
 	}
 	else
 	{
-		new_env = _strcat(_strcat(argv[1], "="), argv[2]);
-		env[env_len] = malloc(sizeof(char) * _str_len(new_env) + 1);
-		env[env_len] = new_env;
-		return (0); /*exit(EXIT_SUCCESS);*/
+		_strcpy(&new_env[0], argv[1]);
+		_strcpy(&new_env[_strlen(new_env)], "=");
+		_strcpy(&new_env[_strlen(new_env)], argv[2]);
+		env[env_len] = _strdup(new_env);
+		return (0);
 	}
 }
 
@@ -54,39 +60,38 @@ int handle_setenv(char **argv, char **env, char *parent_name)
  */
 int handle_unsetenv(char **argv, char **env, char *parent_name)
 {
-	int env_len = 0, index = 0, check = 0, x = 0;
-	char *err_msg;
+	int len = 0, x = 0;
+	char err[4096], str[4096];
 
 	while (argv[x])
 		x++;
-	err_msg = _strcat(_strcat(parent_name, ": "), "usetenv: ");
+	_strcpy(&err[0], parent_name);
+	_strcpy(&err[_strlen(err)], ": ");
+	_strcpy(&err[_strlen(err)], "unsetenv: ");
 	if (x > 2 || x < 2)
 	{
-		err_msg = x > 2 ? _strcat(err_msg, "Too many arguments\n")
-		: _strcat(err_msg, "Fewer arguments than expected\n");
-		write(STDERR_FILENO, err_msg, _str_len(err_msg));
-		return (-1); /*exit(EXIT_FAILURE);*/
+		x > 2 ? _strcpy(&err[_strlen(err)], "Too many arguments\n")
+		: _strcpy(&err[_strlen(err)], "Fewer arguments than expected\n");
+		write(STDERR_FILENO, err, _strlen(err));
+		return (-1);
 	}
-	while (env[env_len] != NULL &&
-		_strcmp(_strtok(env[env_len], "=").arr[0], argv[1]) != 0)
-		env_len++;
+	if (env[len] == NULL)
+		return (0);
 
-	if (env[env_len] == NULL)
-		return (0);/*exit(EXIT_SUCCESS);*/
-
-	while (env[check] != NULL)
+	while (env[len] != NULL)
 	{
-		if (check == env_len)
-			check++;
-
-		if (env[check] == NULL)
+		_strcpy(&str[0], env[len]);
+		if (_strcmp(_strtok(str, "="), argv[1]) == 0)
 			break;
-
-		env[index] = env[check];
-		index++;
-		check++;
+		len++;
 	}
-	env[index] = (char *) 0;
-	return (0); /*exit(EXIT_SUCCESS);*/
+	if (env[len] != NULL)
+	{
+		if (env[len + 1] != NULL)
+			env[len] = env[len + 1];
+		else
+			env[len] = (char *) 0;
+	}
+	return (0);
 }
 

@@ -15,7 +15,7 @@ echo $?
 cat AUTHORS | ./hsh
 echo $?
 echo "/bin/ls
-     /bin/ls
+     /bin/ls	
 /bin/ls
    /bin/ls     " | ./hsh
 echo $?
@@ -34,4 +34,7 @@ echo $?
 echo "ls /var ; ls /var" | ./hsh
 echo $?
 echo "/bin/ls ; /bin/ls ; /bin/ls" | ./hsh
+echo $?
+echo "ls /var && ls 
+ls dsfsff && ls " | ./hsh
 echo $?

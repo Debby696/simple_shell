@@ -15,8 +15,8 @@ void update_dir_env(char *var_name, char *new_value,
 	char *av[4];
 
 	av[0] = "setenv";
-	av[1] = var_name;
-	av[2] = new_value;
+	av[1] = _strdup(var_name);
+	av[2] = _strdup(new_value);
 	av[3] = (char *) 0;
 	handle_setenv(av, env, parent_name);
 }
@@ -30,6 +30,8 @@ void update_dir_env(char *var_name, char *new_value,
  */
 void last_condition(char **argv, char *parent_name, char **env, char *err_msg)
 {
+	char err[4096];
+
 	if (chdir(argv[1]) == 0)
 	{
 		update_dir_env("PWD", argv[1], parent_name, env);
@@ -37,10 +39,11 @@ void last_condition(char **argv, char *parent_name, char **env, char *err_msg)
 	}
 	else
 	{
-		err_msg = _strcat(err_msg, ": ");
-		err_msg = _strcat(err_msg, argv[1]);
-		err_msg = _strcat(err_msg, ": No such file or directory\n");
-		write(STDERR_FILENO, err_msg, _str_len(err_msg));
+		_strcpy(&err[0], err_msg);
+		_strcpy(&err[_strlen(err)], ": ");
+		_strcpy(&err[_strlen(err)], argv[1]);
+		_strcpy(&err[_strlen(err)], ": No such file or directory\n");
+		write(STDERR_FILENO, err, _strlen(err));
 	}
 
 }
@@ -54,16 +57,18 @@ void last_condition(char **argv, char *parent_name, char **env, char *err_msg)
 void handle_cd(char **argv, char **env, char *parent_name)
 {
 	int x = 0;
-	char *err_msg = parent_name;
+	char err[4096];
 
-	err_msg = _strcat(_strcat(err_msg, ": "), argv[0]);
+	_strcpy(&err[0], parent_name);
+	_strcpy(&err[_strlen(err)], ": ");
+	_strcpy(&err[_strlen(err)], argv[0]);
 
 	while (argv[x])
 		x++;
 	if (x > 2)
 	{
-		err_msg = _strcat(err_msg, ": too many arguments\n");
-		write(STDERR_FILENO, err_msg, _str_len(err_msg));
+		_strcpy(&err[_strlen(err)], ": too many arguments\n");
+		write(STDERR_FILENO, err, _strlen(err));
 	}
 	if (x == 1)
 	{
@@ -79,16 +84,16 @@ void handle_cd(char **argv, char **env, char *parent_name)
 
 		if (_strcmp(argv[1], "-") == 0)
 		{
-
 			if (chdir(_getenv("OLDPWD", env)) == 0)
 			{
-				update_dir_env("PWD", _getenv("OLDPWD", env), parent_name, env);
+				update_dir_env("PWD", _getenv("PWD", env), parent_name, env);
 				update_dir_env("OLDPWD", cur_dir, parent_name, env);
 			}
 		}
 		else
 		{
-			last_condition(argv, parent_name, env, err_msg);
+			last_condition(argv, parent_name, env, &err[0]);
 		}
 	}
 }
+
