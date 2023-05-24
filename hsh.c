@@ -103,12 +103,14 @@ void run(char *str, char *parent, char **env)
 	argv[x] = (char *) 0;
 
 	_strcpy(buff, argv[0]);
-	argv[0] = handle_path(env, buff);
 
-	if (check_built_cmd(argv[0]) == 0)
-		run_child_process(parent, argv, env);
-	else
+	if (check_built_cmd(argv[0]) == 1)
 		handle_built_in_commands(argv, env, parent);
+	else
+	{
+		argv[0] = handle_path(env, buff);
+		run_child_process(parent, argv, env);
+	}
 
 	x = 0;
 	while (buff[x])
@@ -160,5 +162,7 @@ int main(int ac, char **av, char **env)
 		if (isatty(STDIN_FILENO))
 			write(STDOUT_FILENO, "$ ", 2);
 	}
+	if (isatty(STDIN_FILENO))
+		write(STDOUT_FILENO, "\nexit\n", _strlen("\nexit\n"));
 	return (0);
 }

@@ -129,6 +129,7 @@ void handle_built_in_commands(char **argv, char **env, char *parent_name)
 		while (env[x] != NULL)
 		{
 			write(STDOUT_FILENO, env[x], _strlen(env[x]));
+			write(STDOUT_FILENO, "\n", 1);
 			x++;
 		}
 
