@@ -1,19 +1,6 @@
 #include "shell.h"
 
 /**
- * check_delim - function that checks whether a charactter is the delimeter.
- * @c: character to be checked.
- * @delim: delimeter charater.
- * Return: 1 if character is delim 0 if not.
- */
-int check_delim(char c, char *delim)
-{
-	if (c == *delim)
-		return (1);
-	return (0);
-}
-
-/**
  * _strtok - function that breaks up a string into tokens
  * @src: String that is to be broken up.
  * @delim: character specifiying where the string is to be broken.
@@ -31,7 +18,7 @@ char *_strtok(char *src, char *delim)
 
 	while (1)
 	{
-		if (check_delim(*src, delim))
+		if (*src == *delim)
 		{
 			src++;
 			continue;
@@ -49,7 +36,7 @@ char *_strtok(char *src, char *delim)
 			backup = src;
 			return (ret);
 		}
-		if (check_delim(*src, delim))
+		if (*src == *delim)
 		{
 			*src = '\0';
 			backup = src + 1;

@@ -14,6 +14,7 @@
 int check_symbol(char *str, char *parent)
 {
 	char err[4096] = {'\0'};
+	int x = 0;
 
 	if (*str == ';' || *str == '&' || *str == '|')
 	{
@@ -39,6 +40,11 @@ int check_symbol(char *str, char *parent)
 
 		return (1);
 	}
+
+	while (str[x] != '\0' && (str[x] == ' ' || str[x] == '\n'))
+		x++;
+	if (x == _strlen(str))
+		return (1);
 	return (0);
 }
 /**
