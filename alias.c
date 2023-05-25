@@ -28,7 +28,8 @@ void print_alias(char arr[4096][1000])
 
 	while (arr[len][0] != '\0')
 	{
-		_strcpy(&buff[0], "alias ");
+		if (isatty(STDIN_FILENO))
+			_strcpy(&buff[0], "alias ");
 		_strcpy(&buff[_strlen(buff)], arr[len]);
 		_strcpy(&buff[_strlen(buff)], "\n");
 		write(STDOUT_FILENO, buff, _strlen(buff));
